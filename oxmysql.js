@@ -16,6 +16,7 @@ const config = connectionStringParser.parse(connectionString);
 //TODO: semicolor format
 
 const slowQueryWarning = GetConvarInt('mysql_slow_query_warning', 100)
+var debugToggle = GetConvar('mysql_debug', 'false');
 
 const pool = createPool({
     host: config.hosts[0].host,
@@ -32,6 +33,7 @@ const pool = createPool({
 });
 
 const execute = async (query, parameters) => {
+    if (debugToggle === "true") { console.log(query, parameters) }
     ScheduleResourceTick(GetCurrentResourceName());
     try {
         const startTime = process.hrtime.bigint();
@@ -75,4 +77,8 @@ global.exports("insert", (query, parameters, callback = () => { }) => {
     execute(query, parameters).then(result =>
         callback(result && result.insertId)
     );
+});
+
+global.exports("sqldebug", () => {
+    debugToggle = GetConvar('mysql_debug', 'false');
 });
