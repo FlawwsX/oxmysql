@@ -82,3 +82,14 @@ local function insertSync(query, parameters)
     return Citizen.Await(p)
 end
 exports('insertSync', insertSync)
+
+local DebugTypes = {
+    ['true'] = true,
+    ['false'] = false
+}
+
+RegisterCommand("sqldebug", function(source, args, rawCommand)
+    local toggle = string.lower(args[1] or "false")
+    SetConvar('mysql_debug', DebugTypes[toggle] or "false")
+    exports['oxmysql']:sqldebug()
+end, true) -- set this to false to allow anyone.
